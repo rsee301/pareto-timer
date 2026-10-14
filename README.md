@@ -3,6 +3,8 @@
 A small macOS menu bar timer. One activity runs at a time; the dropdown shows
 today's activities ranked longest-first with each one's share of the day and a
 running cumulative percentage, so the 80/20 split is visible at a glance.
+Plan the day as a queue of tasks with a time each; a task from the queue runs
+as a countdown with a circle that empties as the time runs out.
 
 [![build](https://github.com/rsee301/pareto-timer/actions/workflows/build.yml/badge.svg)](https://github.com/rsee301/pareto-timer/actions/workflows/build.yml)
 
@@ -65,9 +67,26 @@ The menu bar shows the current activity and its elapsed time, or today's total
 when nothing is running.
 
 - **Start new activity…** (⌘N): type a name, or pick one you've used before
-  from the dropdown. Starting a new activity stops the current one.
+  from the dropdown. Add minutes for a countdown, or leave them blank to count
+  up. Starting a new activity stops the current one.
 - **Click any row in the ranked list** to switch straight back to that activity.
 - **Stop timer** (⌘S): stops the clock without starting anything else.
+
+### Queue and countdown
+
+- **Add to queue…** (⌘A): a task name and a time (`25`, `1:30`, `1h30`;
+  blank is 25 minutes). **Add Another** keeps the dialog open to plan the
+  whole day in one go.
+- **Start next** (⌘↩) starts the top task. Each queue row has a submenu:
+  **Start now**, **Move to top**, **Remove**. A task leaves the queue when it
+  starts. The queue stays until you clear it, so unfinished tasks carry over
+  to tomorrow.
+- While a countdown runs, the menu bar icon is a circle that empties and the
+  title shows the time left. The dropdown shows a large ring at the top.
+- At zero you hear a sound and get a choice: start the next queued task,
+  **5 More Minutes**, **Keep Going** (overtime counts up in red), or **Stop**.
+- **Add 5 minutes** in the menu extends a running countdown.
+- Tracked time goes into the ranked list the same as before, countdown or not.
 - **Reset today…**: clears today's log only; earlier days are kept.
 - **Open at login**: toggles autostart (macOS 13+).
 
@@ -93,7 +112,8 @@ Totals cover today only and roll over at midnight on their own.
 ## Where the data lives
 
 `~/Library/Application Support/ParetoTimer/entries.json`: plain JSON, one
-record per tracked stretch (`activity`, `start`, `end`). **Show data file in
+record per tracked stretch (`activity`, `start`, `end`, and `planned` seconds
+for a countdown). The queue is `queue.json` in the same folder. **Show data file in
 Finder** in the menu opens it. History is never deleted, so past days remain
 available if you want to chart them later. Reinstalling or updating the app
 does not touch this file.
@@ -107,9 +127,11 @@ does not touch this file.
 
 ## Changing it
 
-Everything is in `ParetoTimer.swift` (~450 lines, AppKit only). Re-run
+Everything is in `ParetoTimer.swift` (~840 lines, AppKit only). Re-run
 `bash build.sh` after any edit. Some likely tweaks:
 
 - `totals(on:now:)` in `Store`: change the window from today to this week.
 - `menuNeedsUpdate`: the row format string and the `cum >= 80` cut-off.
 - `refreshTitle`: what the menu bar itself displays.
+- `drawPie` and `RingView`: the countdown circle in the menu bar and the dropdown.
+- `timeUp`: what happens when a countdown reaches zero.
