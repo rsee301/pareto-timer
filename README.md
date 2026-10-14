@@ -52,14 +52,15 @@ other dependencies: no Homebrew, no Python, nothing to keep updated.
 ## Releases
 
 CI (`.github/workflows/build.yml`) builds the app on every push and pull
-request and keeps the zip as a workflow artifact. To publish a download, push
-a version tag:
+request and keeps the zip as a workflow artifact. To publish a download:
 
-```bash
-git tag v1.1.0 && git push origin v1.1.0
-```
+- **From the browser:** Actions tab > **build** > **Run workflow**, enter a
+  version like `1.1.0`, click **Run workflow**.
+- **From git:** `git tag v1.1.0 && git push origin v1.1.0`
 
-CI builds that version and attaches `ParetoTimer.zip` to a GitHub release.
+Either way CI builds that version, creates the `v1.1.0` tag, and attaches
+`ParetoTimer.zip` to a GitHub release. The install line above always gets the
+newest one.
 
 ## Using it
 
